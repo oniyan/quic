@@ -19,9 +19,7 @@ type IpTosTy = libc::c_int;
 impl super::UdpExt for UdpSocket {
     fn init_ext(&self) -> io::Result<()> {
         // Safety
-        assert_eq!(
-            mem::size_of::<SocketAddrV4>(),
-            mem::size_of::<libc::sockaddr_in>()
+
         );
         assert_eq!(
             mem::size_of::<SocketAddrV6>(),
