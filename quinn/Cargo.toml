@@ -1,0 +1,78 @@
+[package]
+name = "quinn"
+version = "0.6.1"
+authors = ["Benjamin Saunders <ben.e.saunders@gmail.com>", "Dirkjan Ochtman <dirkjan@ochtman.nl>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/djc/quinn"
+description = "QUIC transport protocol implementation for Tokio"
+readme = "../README.md"
+keywords = ["quic"]
+categories = [ "network-programming", "asynchronous" ]
+workspace = ".."
+edition = "2018"
+
+[package.metadata.docs.rs]
+all-features = true
+
+[features]
+default = ["native-certs", "certificate-transparency", "tls-rustls"]
+# Use Google's list of CT logs to enable certificate transparency checks
+certificate-transparency = ["proto/certificate-transparency"]
+# Trust the contents of the OS certificate store by default
+native-certs = ["proto/native-certs"]
+tls-rustls = ["rustls", "webpki", "proto/tls-rustls"]
+
+[badges]
+codecov = { repository = "djc/quinn" }
+maintenance = { status = "experimental" }
+
+[dependencies]
+bytes = "0.5.2"
+err-derive = "0.2.3"
+futures = "0.3.1"
+libc = "0.2.69"
+mio = "0.6"
+proto = { package = "quinn-proto", path = "../quinn-proto", version = "0.6.1" }
+rustls = { version = "0.18.0", features = ["quic"], optional = true }
+tracing = "0.1.10"
+tokio = { version = "0.2.6", features = ["rt-core", "io-driver", "time"] }
+webpki = { version = "0.21", optional = true }
+
+[dev-dependencies]
+anyhow = "1.0.22"
+crc = "1.8.1"
+bencher = "0.1.5"
+directories-next = "1.0.1"
+rand = "0.7"
+rcgen = "0.8"
+structopt = "0.3.0"
+tokio = { version = "0.2.6", features = ["rt-threaded", "time", "macros"] }
+tracing-subscriber = { version = "0.2.5", default-features = false, features = ["env-filter", "fmt", "ansi", "chrono"]}
+tracing-futures = { version = "0.2.0", default-features = false, features = ["std-future"] }
+unwrap = "1.2.1"
+url = "2"
+
+[[example]]
+name = "server"
+required-features = ["tls-rustls"]
+
+[[example]]
+name = "client"
+required-features = ["tls-rustls"]
+
+[[example]]
+name = "insecure_connection"
+required-features = ["rustls/dangerous_configuration"]
+
+[[example]]
+name = "single_socket"
+required-features = ["tls-rustls"]
+
+[[example]]
+name = "connection"
+required-features = ["tls-rustls"]
+
+[[bench]]
+name = "bench"
+harness = false
+required-features = ["tls-rustls"]

@@ -1,0 +1,44 @@
+[package]
+name = "quinn-proto"
+version = "0.6.1"
+authors = ["Benjamin Saunders <ben.e.saunders@gmail.com>", "Dirkjan Ochtman <dirkjan@ochtman.nl>"]
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/djc/quinn"
+description = "State machine for the QUIC transport protocol"
+keywords = ["quic"]
+categories = [ "network-programming", "asynchronous" ]
+workspace = ".."
+edition = "2018"
+
+[package.metadata.docs.rs]
+all-features = true
+
+[badges]
+maintenance = { status = "experimental" }
+
+[features]
+default = ["tls-rustls"]
+# Use Google's list of CT logs to enable certificate transparency checks
+certificate-transparency = ["ct-logs"]
+tls-rustls = ["rustls", "webpki", "ring"]
+# Trust the contents of the OS certificate store by default
+native-certs = ["rustls-native-certs"]
+
+[dependencies]
+bytes = "0.5.2"
+ct-logs = { version = "0.7", optional = true }
+err-derive = "0.2.3"
+rand = "0.7"
+ring = { version = "0.16.7", optional = true }
+rustls = { version = "0.18", features = ["quic"], optional = true }
+rustls-native-certs = { version = "0.4", optional = true }
+slab = "0.4"
+tracing = "0.1.10"
+webpki = { version = "0.21", optional = true }
+
+[dev-dependencies]
+assert_matches = "1.1"
+hex-literal = "0.2.0"
+rcgen = "0.8"
+tracing-subscriber = { version = "0.2.5", default-features = false, features = ["env-filter", "fmt", "ansi", "chrono"]}
+lazy_static = "1"
