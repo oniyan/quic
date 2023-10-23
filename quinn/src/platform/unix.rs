@@ -20,7 +20,6 @@ impl super::UdpExt for UdpSocket {
     fn init_ext(&self) -> io::Result<()> {
         // Safety
 
-        );
         assert_eq!(
             mem::size_of::<SocketAddrV6>(),
             mem::size_of::<libc::sockaddr_in6>()
