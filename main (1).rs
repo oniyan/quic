@@ -4232,18 +4232,39 @@ async fn handle_bgp_session(
     local_addr: IpAddr,
     active: bool,
 ) {
-    let stream = if active {
-        let quinn::NewConnection {
-            connection: conn, ..
-        } = { handshake.await.unwrap() };
-        let (s, r) = conn.open_bi().await.unwrap();
-        QuicStream { s, r }
-    } else {
-        let quinn::NewConnection { mut bi_streams, .. } = handshake.await.unwrap();
-        let quic_stream = bi_streams.next().await.unwrap().unwrap();
-        QuicStream {
-            s: quic_stream.0,
-            r: quic_stream.1,
+    let result = handshake.await;
+    let stream = match result {
+        Ok(quinn::NewConnection { connection: conn, mut bi_streams, .. }) => {
+            if active {
+                let (s, r) = match conn.open_bi().await {
+                    Ok((s, r)) => (s, r),
+                    Err(e) => {
+                        println!("An error occurred: {:?}", e);
+                        return; // or handle the error as you see fit
+                    }
+                };
+                QuicStream { s, r }
+            } else {
+                let quic_stream = match bi_streams.next().await {
+                    Some(Ok(stream)) => stream,
+                    Some(Err(e)) => {
+                        println!("An error occurred: {:?}", e);
+                        return; // or handle the error as you see fit
+                    },
+                    None => {
+                        println!("No more streams.");
+                        return; // or handle the error as you see fit
+                    },
+                };
+                QuicStream {
+                    s: quic_stream.0,
+                    r: quic_stream.1,
+                }
+            }
+        },
+        Err(e) => {
+            println!("An error occurred: {:?}", e);
+            return; // or handle the error as you see fit
         }
     };
 
